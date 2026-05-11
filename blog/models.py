@@ -1,7 +1,6 @@
 from django.db import models
 from django.core.validators import MinLengthValidator
 
-
 # Create your models here.
 
 
@@ -37,7 +36,7 @@ class Post(models.Model):
         "Author", on_delete=models.SET_NULL, related_name="posts", null=True
     )
     tags = models.ManyToManyField("Tag")
-    image_name = models.CharField(max_length=100, null=True, blank=True, default="")
+    image_name = models.ImageField(upload_to="images", null=True)
 
     def post_details(self):
         return f"{self.title} ({self.date})"
