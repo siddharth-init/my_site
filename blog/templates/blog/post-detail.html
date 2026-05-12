@@ -18,6 +18,20 @@
             
         
     </div>
+    <div id="read-later">
+        <form action="{% url 'read_later' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="post_id" value="{{ post.id }}" />
+            <button type="submit">
+                {% if is_saved_for_later %}
+                    Remove from Read Later
+                {% else %}
+                    Read for Later
+                {% endif %}
+            </button>
+        </form>
+    </div>    
+
     <article>
         <img src="{{ post.image_name.url}}" alt="{{ post.title }}" />
         <address><a href="mailto:{{ post.author.email }}">{{ post.author }}</a></address>
@@ -26,6 +40,8 @@
 </section>
 <main>
     <p>{{ post.content|linebreaks }}</p>
+    
+    {% if comments %}
     <section id="comments">
         <ul>
             {% for comment in comments %}
@@ -35,7 +51,9 @@
             </li>
             {% endfor %}
         </ul>
-    </section>    
+    </section>
+    {% endif %}    
+    
     <section id="comment-form">
         <h2>Leave a Comment</h2>
         <form action="{% url 'post_detail_page' post.slug %}" method="post">
