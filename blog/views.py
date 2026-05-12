@@ -6,9 +6,11 @@ from django.http import HttpResponse, Http404
 
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
+from django.views.generic import View
 
 # from .data import blog_posts
 from .models import Post
+from .forms import CommentForm
 
 # Create your views here.
 
@@ -41,16 +43,28 @@ class AllPostsView(ListView):
     context_object_name = "posts"
 
 
-class SinglePostView(DetailView):
-    template_name = "blog/post-detail.html"
-    model = Post
+class SinglePostView(View):
+    def get(self, request, slug):
+        post = Post.objects.get(slug=slug)
+        context = {
+            "post": post,
+            "all_tags": post.tags.all(),
+            "comments": post.comments.all().order_by("-id"),
+            "comment_form": CommentForm(),
+        }
+        return render(request, "blog/post-detail.html", context)
 
-    """
-    For using the Tag class I am overriding the get_context_data to get all tags
-    It has many to many relationship with Posts
-    """
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["all_tags"] = self.object.tags.all()  # type: ignore
-        return context
+    def post(self, request, slug):
+        post = Post.objects.get(slug=slug)
+        context = {
+            "post": post,
+            "all_tags": post.tags.all(),
+            "comments": post.comments.all().order_by("-id"),
+            "comment_form": CommentForm(),
+        }
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.post = post
+            comment.save()
+        return render(request, "blog/post-detail.html", context)

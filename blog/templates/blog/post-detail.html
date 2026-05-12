@@ -26,5 +26,29 @@
 </section>
 <main>
     <p>{{ post.content|linebreaks }}</p>
+    <section id="comments">
+        <ul>
+            {% for comment in comments %}
+            <li>
+                    <h2><a href="mailto:{{ comment.user_email }}">{{ comment.user_name }}</a></h2>
+                    <p>{{ comment.text|linebreaks }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>    
+    <section id="comment-form">
+        <h2>Leave a Comment</h2>
+        <form action="{% url 'post_detail_page' post.slug %}" method="post">
+            {% csrf_token %}
+            {% for field in comment_form %}
+            <div class="form-control">
+                {{ field.label_tag }}
+                {{ field }}
+                {{ field.errors }}
+            </div>
+            {% endfor %}
+            <button type="submit">Save Comment</button>
+        </form>    
+    </section>
 </main>
 {% endblock %}
